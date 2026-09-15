@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Grimorio del Coyote</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="icon" href="/icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<meta name="theme-color" content="#14111d">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -37,6 +41,9 @@
   .google-btn:hover{background:#f7f7f7;}
   .auth-divider{display:flex;align-items:center;gap:10px;color:var(--text-dim);font-size:12px;margin-bottom:16px;}
   .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--line);}
+  .install-btn{position:fixed;top:12px;right:12px;z-index:200;display:none;align-items:center;gap:8px;padding:9px 14px;border-radius:20px;border:1px solid var(--gold);background:var(--bg-elev);color:var(--gold-bright);font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,0.35);}
+  .install-btn:hover{background:var(--bg-elev2);}
+  @media (max-width:480px){ .install-btn{top:auto;bottom:16px;right:16px;} }
 
   /* ---- App shell ---- */
   #appShell{display:none;}
@@ -166,6 +173,8 @@
 
 <div class="bg-texture"></div>
 
+<button class="install-btn" id="btnInstall" type="button">⬇ Instalar app</button>
+
 <!-- ===================== AUTH SCREEN ===================== -->
 <div id="authScreen">
   <div class="auth-card">
@@ -269,6 +278,26 @@ import { firebaseConfig } from "./firebase-config.js";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// ================= PWA INSTALL =================
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=> navigator.serviceWorker.register('/sw.js').catch(()=>{}));
+}
+let deferredInstallPrompt = null;
+const btnInstall = document.getElementById('btnInstall');
+window.addEventListener('beforeinstallprompt', (e)=>{
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  btnInstall.style.display = 'flex';
+});
+btnInstall.onclick = async ()=>{
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  await deferredInstallPrompt.userChoice;
+  deferredInstallPrompt = null;
+  btnInstall.style.display = 'none';
+};
+window.addEventListener('appinstalled', ()=>{ btnInstall.style.display = 'none'; });
 
 // ================= AUTH LOGIC =================
 const authError = document.getElementById('authError');
