@@ -776,6 +776,87 @@ const SPELLS = [
 ];
 
 
+// Linajes 2024 (antes "subrazas"): solo aplican a algunas razas y agregan
+// un truco o rasgo extra, sin bonus de característica. Resumen propio, breve.
+const LINAJE_DATA = {
+  'Elfo': [
+    {nombre:'Alto Elfo', rasgos:'Conocés un truco de mago a elección (usando Inteligencia, Sabiduría o Carisma como característica). Buen manejo de la espada larga y el arco.'},
+    {nombre:'Elfo del Bosque', rasgos:'Velocidad algo mayor. Podés intentar esconderte incluso con cobertura ligera de vegetación. Conocés un truco relacionado con la naturaleza.'},
+    {nombre:'Elfo Oscuro (Drow)', rasgos:'Visión en la oscuridad superior (18 metros). Sensibilidad a la luz solar (desventaja en ataques y Percepción bajo sol directo). A niveles más altos accedés a conjuros menores de oscuridad.'}
+  ],
+  'Tiflin': [
+    {nombre:'Legado Abisal', rasgos:'Resistencia al daño de veneno. Trucos y conjuros menores ligados al veneno o al ácido a medida que subís de nivel.'},
+    {nombre:'Legado Ctónico', rasgos:'Trucos y conjuros menores de corte psíquico o nigromántico a medida que subís de nivel.'},
+    {nombre:'Legado Infernal', rasgos:'Resistencia al daño de fuego. Trucos y conjuros menores de fuego a medida que subís de nivel (el legado clásico "diabólico").'}
+  ],
+  'Dracónido': [
+    {nombre:'Ascendencia Negra/Verde (ácido/veneno)', rasgos:'Arma de aliento en línea o cono con daño ácido o veneno; resistencia a ese tipo de daño.'},
+    {nombre:'Ascendencia Azul/Bronce (eléctrico)', rasgos:'Arma de aliento en línea con daño eléctrico; resistencia al daño eléctrico.'},
+    {nombre:'Ascendencia Roja/Oro/Latón (fuego)', rasgos:'Arma de aliento en cono con daño de fuego; resistencia al daño de fuego.'},
+    {nombre:'Ascendencia Blanca/Plata (frío)', rasgos:'Arma de aliento en cono con daño de frío; resistencia al daño de frío.'}
+  ],
+  'Gnomo': [
+    {nombre:'Gnomo del Bosque', rasgos:'Conocés el truco Ilusión Menor. Podés comunicarte de forma simple con pequeñas bestias.'},
+    {nombre:'Gnomo de las Rocas', rasgos:'Competencia con herramientas de artesano (herrero, alquimista, etc.). Podés fabricar pequeños artilugios mecánicos menores.'}
+  ],
+  'Aasimar': [
+    {nombre:'Protector (desde nivel 3)', rasgos:'Podés manifestar alas espectrales brevemente y ganar una pizca de vuelo, además de un pequeño extra de daño radiante en un ataque.'},
+    {nombre:'Alado (desde nivel 3)', rasgos:'Podés manifestar alas y volar brevemente con tu velocidad normal.'},
+    {nombre:'Flagelo (desde nivel 3)', rasgos:'Podés liberar un estallido de energía necrótica/radiante que daña a tu alrededor y te cura un poco, brevemente.'}
+  ]
+};
+
+const CLASE_DATA = {
+  'Bárbaro': {dado:'d12', salvaciones:['fue','con']},
+  'Bardo': {dado:'d8', salvaciones:['des','car']},
+  'Brujo': {dado:'d8', salvaciones:['sab','car']},
+  'Clérigo': {dado:'d8', salvaciones:['sab','car']},
+  'Druida': {dado:'d8', salvaciones:['int','sab']},
+  'Explorador': {dado:'d10', salvaciones:['fue','des']},
+  'Guerrero': {dado:'d10', salvaciones:['fue','con']},
+  'Hechicero': {dado:'d6', salvaciones:['con','car']},
+  'Mago': {dado:'d6', salvaciones:['int','sab']},
+  'Monje': {dado:'d8', salvaciones:['fue','des']},
+  'Paladín': {dado:'d10', salvaciones:['sab','car']},
+  'Pícaro': {dado:'d8', salvaciones:['des','int']},
+};
+
+// Resumen propio y breve de rasgos raciales (no es el texto del manual, es una síntesis mecánica orientativa)
+const RAZA_DATA = {
+  'Aasimar': {velocidad:9, rasgos:'Resistencia a daño necrótico y radiante. Visión en la oscuridad. Truco de luz. Desde nivel 3, una vez por descanso largo puede transformarse brevemente (alas, aura curativa o aura dañina, según el linaje).'},
+  'Dracónido': {velocidad:9, rasgos:'Ascendencia dracónica que define el tipo de daño de su aliento. Arma de aliento en área una vez por descanso corto o largo, con resistencia a ese mismo tipo de daño.'},
+  'Elfo': {velocidad:9, rasgos:'Visión en la oscuridad. Ventaja en salvaciones contra ser hechizado. No necesita dormir (entra en trance 4 horas). El linaje elegido (alto, del bosque, drow, etc.) suma un truco o rasgo adicional.'},
+  'Enano': {velocidad:7.5, rasgos:'Visión en la oscuridad. Resistencia al daño de veneno. Ventaja en salvaciones contra quedar envenenado. Competencia con un tipo de herramienta de artesano.'},
+  'Gnomo': {velocidad:7.5, rasgos:'Visión en la oscuridad. Astucia gnoma: ventaja en salvaciones de Inteligencia, Sabiduría y Carisma contra efectos mágicos.'},
+  'Goliat': {velocidad:9, rasgos:'Resistencia pétrea ancestral: reduce daño recibido una vez por descanso corto o largo. Aguante ante calor y altitud extremos. Buen salto.'},
+  'Humano': {velocidad:9, rasgos:'Rasgo versátil a elección del jugador (por ejemplo, competencia con una habilidad adicional o similar), reflejando su adaptabilidad.'},
+  'Mediano': {velocidad:7.5, rasgos:'Suerte: repite los 1 naturales en tiradas de d20. Sigilo natural: puede esconderse detrás de criaturas más grandes. Valentía: ventaja en salvaciones contra asustado.'},
+  'Orco': {velocidad:9, rasgos:'Visión en la oscuridad. Resistencia implacable: al llegar a 0 PG, una vez por descanso largo vuelve a 1 PG. Adrenalina para moverse más rápido brevemente.'},
+  'Tiflin': {velocidad:9, rasgos:'Visión en la oscuridad. Resistencia al daño de fuego. Trucos y conjuros menores de fuego u oscuridad según el legado infernal elegido.'}
+};
+
+// Trasfondos: 2 competencias de habilidad típicas de cada uno (resumen orientativo)
+const TRASFONDO_DATA = {
+  'Acólito': {habilidades:['perspicacia','religion']},
+  'Artesano': {habilidades:['investigacion','persuasion']},
+  'Artista': {habilidades:['acrobacias','interpretacion']},
+  'Charlatán': {habilidades:['engano','juegomanos']},
+  'Criminal': {habilidades:['engano','sigilo']},
+  'Ermitaño': {habilidades:['medicina','religion']},
+  'Forastero': {habilidades:['atletismo','supervivencia']},
+  'Granjero': {habilidades:['tratoanimales','naturaleza']},
+  'Guardia': {habilidades:['atletismo','perspicacia']},
+  'Guía': {habilidades:['sigilo','supervivencia']},
+  'Huérfano': {habilidades:['juegomanos','percepcion']},
+  'Marinero': {habilidades:['atletismo','percepcion']},
+  'Mercader': {habilidades:['persuasion','investigacion']},
+  'Noble': {habilidades:['historia','persuasion']},
+  'Sabio': {habilidades:['arcanos','historia']},
+  'Soldado': {habilidades:['atletismo','intimidacion']},
+  'Vigilante': {habilidades:['perspicacia','percepcion']}
+};
+const ALINEAMIENTOS = ['Legal Bueno','Neutral Bueno','Caótico Bueno','Legal Neutral','Neutral','Caótico Neutral','Legal Malvado','Neutral Malvado','Caótico Malvado'];
+
 // filtros del grimorio
 let state = { search:"", nivel:null, escuela:null, clase:"", conc:false, rit:false, soloFav:false, soloPrep:false };
 let favoritos = new Set();
@@ -1052,6 +1133,8 @@ function renderListasPersonajes(){
     el.onclick = ()=>{
       const id = el.dataset.id;
       const p = el.dataset.tipo==='mio' ? misPersonajes.find(x=>x.id===id) : compartidosConmigo.find(x=>x.id===id);
+      personajeActivoId = id;
+      actualizarPersonajeActivo();
       abrirEditorPersonaje(p);
     };
   });
@@ -1149,7 +1232,10 @@ function renderEditorPersonaje(){
     <div class="two-col">
       <div>
         <span class="cf-label">Clase</span>
-        <div class="cf-row"><input type="text" id="pf-clase" value="${p.clase||''}" ${disabledAttr}></div>
+        <div class="cf-row"><select id="pf-clase" ${disabledAttr}>
+          <option value="">— Elegir —</option>
+          ${Object.keys(CLASE_DATA).map(c=>`<option value="${c}" ${p.clase===c?'selected':''}>${c}</option>`).join('')}
+        </select></div>
       </div>
       <div>
         <span class="cf-label">Subclase</span>
@@ -1159,17 +1245,35 @@ function renderEditorPersonaje(){
     <div class="two-col">
       <div>
         <span class="cf-label">Raza / Linaje</span>
-        <div class="cf-row"><input type="text" id="pf-raza" value="${p.raza||''}" ${disabledAttr}></div>
+        <div class="cf-row"><select id="pf-raza" ${disabledAttr}>
+          <option value="">— Elegir —</option>
+          ${Object.keys(RAZA_DATA).map(r=>`<option value="${r}" ${p.raza===r?'selected':''}>${r}</option>`).join('')}
+        </select></div>
+        <div id="razaInfoBox" style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 4px;line-height:1.4;">${p.raza && RAZA_DATA[p.raza] ? RAZA_DATA[p.raza].rasgos : ''}</div>
+        <div id="linajeWrap" style="${LINAJE_DATA[p.raza] ? '' : 'display:none;'}">
+          <span class="cf-label">Linaje</span>
+          <div class="cf-row"><select id="pf-linaje" ${disabledAttr}>
+            <option value="">— Elegir —</option>
+            ${(LINAJE_DATA[p.raza]||[]).map(l=>`<option value="${l.nombre}" ${p.linaje===l.nombre?'selected':''}>${l.nombre}</option>`).join('')}
+          </select></div>
+          <div id="linajeInfoBox" style="font-size:11.5px;color:var(--ink-soft);margin:-4px 0 4px;line-height:1.4;">${(()=>{ const opts = LINAJE_DATA[p.raza]||[]; const sel = opts.find(l=>l.nombre===p.linaje); return sel ? sel.rasgos : ''; })()}</div>
+        </div>
       </div>
       <div>
         <span class="cf-label">Trasfondo</span>
-        <div class="cf-row"><input type="text" id="pf-trasfondo" value="${p.trasfondo||''}" ${disabledAttr}></div>
+        <div class="cf-row"><select id="pf-trasfondo" ${disabledAttr}>
+          <option value="">— Elegir —</option>
+          ${Object.keys(TRASFONDO_DATA).map(t=>`<option value="${t}" ${p.trasfondo===t?'selected':''}>${t}</option>`).join('')}
+        </select></div>
       </div>
     </div>
     <div class="two-col">
       <div>
         <span class="cf-label">Alineamiento</span>
-        <div class="cf-row"><input type="text" id="pf-alineamiento" value="${p.alineamiento||''}" ${disabledAttr}></div>
+        <div class="cf-row"><select id="pf-alineamiento" ${disabledAttr}>
+          <option value="">— Elegir —</option>
+          ${ALINEAMIENTOS.map(a=>`<option value="${a}" ${p.alineamiento===a?'selected':''}>${a}</option>`).join('')}
+        </select></div>
       </div>
       <div>
         <span class="cf-label">Nivel</span>
@@ -1250,6 +1354,24 @@ function renderEditorPersonaje(){
   charSheetEl.querySelector('.close-btn').onclick = cerrarEditorPersonaje;
 
   if(!ro){
+    // campos simples: se sincronizan al objeto en cada cambio para que un
+    // re-render disparado por OTRO campo (características, habilidades, etc.)
+    // no los pise con el valor viejo.
+    const simpleFieldBindings = [
+      ['#pf-nombre','nombre','text'], ['#pf-subclase','subclase','text'],
+      ['#pf-nivel','nivel','int'], ['#pf-ca','ca','int'], ['#pf-vel','velocidad','int'],
+      ['#pf-pgmax','pgMax','int'], ['#pf-pgact','pgActual','int'], ['#pf-pgtemp','pgTemp','int'],
+      ['#pf-dado','dadoGolpe','text'], ['#pf-equipo','equipo','text'],
+      ['#pf-rasgos','rasgos','text'], ['#pf-notas','notas','text']
+    ];
+    simpleFieldBindings.forEach(([sel,key,tipo])=>{
+      const inp = charSheetEl.querySelector(sel);
+      if(!inp) return;
+      inp.oninput = ()=>{
+        editorPersonajeActual[key] = tipo==='int' ? (Number(inp.value)||0) : inp.value;
+      };
+    });
+
     charSheetEl.querySelectorAll('[data-ab]').forEach(inp=>{
       inp.oninput = ()=>{ editorPersonajeActual.caracteristicas[inp.dataset.ab] = Number(inp.value)||10; renderEditorPersonaje(); };
     });
@@ -1311,8 +1433,18 @@ function renderEditorPersonaje(){
           const arr = editorPersonajeActual.conjurosPreparados;
           const i = arr.indexOf(id);
           if(i<0) arr.push(id); else arr.splice(i,1);
+          // guardamos al toque si el personaje ya existe, para no depender
+          // de que se acuerden de tocar "Guardar" antes de cerrar la ficha
+          if(editorPersonajeActual.id) guardarPersonajeFirestore(editorPersonajeActual);
           renderEditorPersonaje();
-          buscarInput.value = term; buscarInput.focus();
+          // renderEditorPersonaje() reconstruyó el DOM: el buscarInput viejo
+          // quedó desconectado, hay que re-buscar el nuevo y re-disparar la búsqueda
+          const nuevoBuscar = charSheetEl.querySelector('#pf-buscar-conjuro');
+          if(nuevoBuscar){
+            nuevoBuscar.value = term;
+            nuevoBuscar.focus();
+            nuevoBuscar.dispatchEvent(new Event('input'));
+          }
         };
       });
     }
@@ -1322,11 +1454,58 @@ function renderEditorPersonaje(){
         const id = btn.dataset.quitarConjuro;
         const arr = editorPersonajeActual.conjurosPreparados||[];
         const i = arr.indexOf(id); if(i>=0) arr.splice(i,1);
+        if(editorPersonajeActual.id) guardarPersonajeFirestore(editorPersonajeActual);
         renderEditorPersonaje();
       };
     });
 
     charSheetEl.querySelector('#pf-caracconj').onchange = (e)=>{ editorPersonajeActual.caracteristicaConjuros = e.target.value; };
+
+    const selClase = charSheetEl.querySelector('#pf-clase');
+    if(selClase){
+      selClase.onchange = (e)=>{
+        editorPersonajeActual.clase = e.target.value;
+        const d = CLASE_DATA[e.target.value];
+        if(d){
+          editorPersonajeActual.dadoGolpe = d.dado;
+          editorPersonajeActual.salvacionesComp = [...d.salvaciones];
+        }
+        renderEditorPersonaje();
+      };
+    }
+    const selRaza = charSheetEl.querySelector('#pf-raza');
+    if(selRaza){
+      selRaza.onchange = (e)=>{
+        editorPersonajeActual.raza = e.target.value;
+        editorPersonajeActual.linaje = ''; // se resetea al cambiar de raza
+        const d = RAZA_DATA[e.target.value];
+        if(d){ editorPersonajeActual.velocidad = d.velocidad; }
+        renderEditorPersonaje();
+      };
+    }
+    const selLinaje = charSheetEl.querySelector('#pf-linaje');
+    if(selLinaje){
+      selLinaje.onchange = (e)=>{
+        editorPersonajeActual.linaje = e.target.value;
+        renderEditorPersonaje();
+      };
+    }
+    const selTrasfondo = charSheetEl.querySelector('#pf-trasfondo');
+    if(selTrasfondo){
+      selTrasfondo.onchange = (e)=>{
+        editorPersonajeActual.trasfondo = e.target.value;
+        const d = TRASFONDO_DATA[e.target.value];
+        if(d){
+          editorPersonajeActual.habilidadesComp = editorPersonajeActual.habilidadesComp || [];
+          d.habilidades.forEach(h=>{ if(!editorPersonajeActual.habilidadesComp.includes(h)) editorPersonajeActual.habilidadesComp.push(h); });
+        }
+        renderEditorPersonaje();
+      };
+    }
+    const selAlineamiento = charSheetEl.querySelector('#pf-alineamiento');
+    if(selAlineamiento){
+      selAlineamiento.onchange = (e)=>{ editorPersonajeActual.alineamiento = e.target.value; };
+    }
 
     const btnCompartir = charSheetEl.querySelector('#btnCompartir');
     if(btnCompartir){
@@ -1355,6 +1534,7 @@ function renderEditorPersonaje(){
       p2.clase = charSheetEl.querySelector('#pf-clase').value.trim();
       p2.subclase = charSheetEl.querySelector('#pf-subclase').value.trim();
       p2.raza = charSheetEl.querySelector('#pf-raza').value.trim();
+      p2.linaje = editorPersonajeActual.linaje || '';
       p2.trasfondo = charSheetEl.querySelector('#pf-trasfondo').value.trim();
       p2.alineamiento = charSheetEl.querySelector('#pf-alineamiento').value.trim();
       p2.nivel = Math.min(20, Math.max(1, Number(charSheetEl.querySelector('#pf-nivel').value)||1));
@@ -1393,6 +1573,10 @@ async function guardarPersonajeFirestore(p){
     data.creadoEn = serverTimestamp();
     const ref = await addDoc(collection(db,'personajes'), data);
     editorPersonajeActual.id = ref.id;
+    // un personaje recién creado queda activo automáticamente, si no
+    // nunca se podría usar el filtro "Preparados" sin ir a activarlo aparte
+    personajeActivoId = ref.id;
+    actualizarPersonajeActivo();
   } else {
     await updateDoc(doc(db,'personajes', id), data);
   }
